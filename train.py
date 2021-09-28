@@ -88,11 +88,11 @@ def face_recog(v, c):
 def vmodel_acc(y_pred1, y_pred2, margin=1.):
     return (true_positives(y_pred1, margin)+true_negatives(y_pred2, margin))/2
 
-def true_positives(y_pred, margin=1.):
+def true_positives_rate(y_pred, margin=1.):
     true_positives = tf.cast(tf.less(y_pred, margin), y_pred.dtype)
     return true_positives
 
-def true_negatives(y_pred, margin=1.):
+def true_negatives_rate(y_pred, margin=1.):
     true_negatives = tf.cast(tf.greater_equal(y_pred, margin), y_pred.dtype)
     return true_negatives
 
@@ -104,8 +104,8 @@ class SiameseModel(keras.Model):
         self.margin = margin
         self.loss_tracker = keras.metrics.Mean(name="loss")
         self.acc_tracker = keras.metrics.Mean(name="acc")
-        self.tpos_tracker = keras.metrics.Mean(name="true_positives")
-        self.tneg_tracker = keras.metrics.Mean(name="true_negatives")
+        self.tpos_tracker = keras.metrics.Mean(name="true_positive_rate")
+        self.tneg_tracker = keras.metrics.Mean(name="true_negative_rate")
 
     def call(self, inputs):
         return self.siamese_network(inputs)
@@ -123,8 +123,8 @@ class SiameseModel(keras.Model):
         # Update and return the loss metric
         self.loss_tracker.update_state(loss)
         self.acc_tracker.update_state(vmodel_acc(ap_distance, an_distance, self.margin))
-        self.tpos_tracker.update_state(true_positives(ap_distance, self.margin))
-        self.tneg_tracker.update_state(true_negatives(an_distance, self.margin))
+        self.tpos_tracker.update_state(true_positive_rate(ap_distance, self.margin))
+        self.tneg_tracker.update_state(true_negative_rate(an_distance, self.margin))
         return {m.name: m.result() for m in self.metrics}
 
     def test_step(self, data):
@@ -135,8 +135,8 @@ class SiameseModel(keras.Model):
         # Update and return the loss metric.
         self.loss_tracker.update_state(loss)
         self.acc_tracker.update_state(vmodel_acc(ap_distance, an_distance, self.margin))
-        self.tpos_tracker.update_state(true_positives(ap_distance, self.margin))
-        self.tneg_tracker.update_state(true_negatives(an_distance, self.margin))
+        self.tpos_tracker.update_state(true_positive_rate(ap_distance, self.margin))
+        self.tneg_tracker.update_state(true_negative_rate(an_distance, self.margin))
         return {m.name: m.result() for m in self.metrics}
 
     def _compute_loss(self, ap_distance, an_distance):

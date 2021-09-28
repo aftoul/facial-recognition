@@ -49,9 +49,9 @@ The model uses is a standard ResNet50V2, with a few dense layers to compute the 
 
 For our target use case, rejecting a known face is less undesirable than falsely identifying it. So we weighted the loss function to minimize false positives as much as possible.
 
-| Overall accuracy | True positives | True negatives |
-|------------------|----------------|----------------|
-| 79.92%           | 60.47%         | 99.37%         |
+| Overall accuracy | Sensitivity | Specificity |
+|------------------|-------------|-------------|
+| 79.92%           | 60.47%      | 99.37%      |
 
 ## Test
 
