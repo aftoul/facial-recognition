@@ -1,0 +1,5 @@
+*.pyc
+nn/
+dataset/*.csv
+dataset/images/
+known_people/*
